@@ -30,7 +30,7 @@ jobs:
 
       - name: Migrate Database
         run: |
-          dotnet tool install dotnet-ef
+          dotnet tool install --global dotnet-ef
           dotnet tool restore
           dotnet-ef database update --context EmployeesContext
 
