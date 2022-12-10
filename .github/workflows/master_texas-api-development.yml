@@ -32,7 +32,7 @@ jobs:
         run: |
           dotnet tool install --global dotnet-ef
           dotnet tool restore
-          dotnet-ef database update --context EmployeesContext
+          dotnet-ef database update --context EmployeesDbContext
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
