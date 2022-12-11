@@ -1,6 +1,3 @@
-// using Employees.API.Data;
-// using Microsoft.EntityFrameworkCore;
-
 using Texas.API;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,9 +23,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// app.UseCors(builder => 
-//     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
-// );
+app.UseCors(builder =>
+    builder.WithOrigins(app.Configuration.GetValue<string>("AllowedOrigin")).AllowAnyHeader().AllowAnyMethod()
+);
 
 app.UseAuthorization();
 
