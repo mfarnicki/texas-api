@@ -1,9 +1,12 @@
 public class Game : IGame
 {
-    public Guid Id {get;}
+    public string Id { get; set; }
+
+    public Guid GameId { get; set; }
 
     public Game()
     {
-        this.Id = Guid.NewGuid();
+        this.GameId = Guid.NewGuid();
+        this.Id = this.GameId.ToString();
     }
 }

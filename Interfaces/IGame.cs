@@ -1,4 +1,10 @@
+using Newtonsoft.Json;
+
 public interface IGame
 {
-    public Guid Id {get;}
+    [JsonProperty("id")]
+    public string Id { get; set; }
+
+    [JsonProperty("gameId")]
+    public Guid GameId { get; set; }
 }
