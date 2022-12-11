@@ -25,7 +25,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(builder => 
-    builder.WithOrigins(app.Configuration.GetValue<string>("AllowedOrigin")).AllowAnyHeader().AllowAnyMethod()
+    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
 );
 
 app.UseAuthorization();
