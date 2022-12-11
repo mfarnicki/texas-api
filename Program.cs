@@ -1,5 +1,5 @@
-using Employees.API.Data;
-using Microsoft.EntityFrameworkCore;
+// using Employees.API.Data;
+// using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<EmployeesDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeesContext")));
+// builder.Services.AddDbContext<EmployeesDbContext>(options =>
+// options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeesContext")));
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -31,5 +33,6 @@ app.UseCors(builder =>
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
