@@ -17,6 +17,11 @@ namespace Texas.API.Models
             return await this._cosmos.ReadAll<Game>();
         }
 
+        public async Task<IGame> GetSingleGame(Guid id)
+        {
+            return await this._cosmos.Read<Game>(id);
+        }
+
         public async Task<IGame> NewGame()
         {
             var newGame = new Game();

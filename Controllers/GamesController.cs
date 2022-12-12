@@ -19,6 +19,15 @@ public class GamesController : ControllerBase
         return Ok(games);
     }
 
+    [HttpGet]
+    [Route("{id:Guid}")]
+    public async Task<IActionResult> GetGame(Guid id)
+    {
+        var game = await this._gamesRepository.GetSingleGame(id);
+        return Ok(game);
+    }
+
+
     [HttpPost]
     public async Task<IActionResult> AddGame()
     {
