@@ -17,7 +17,7 @@ namespace Texas.API.Data
 
         public async Task Upsert<T>(T item) where T : IGame
         {
-            await this._container.UpsertItemAsync<T>(item, new PartitionKey(item.GameId.ToString()));
+            await this._container.UpsertItemAsync<T>(item, new PartitionKey(item.Id.ToString()));
         }
 
         public async Task<T> Read<T>(Guid id) where T : IGame
