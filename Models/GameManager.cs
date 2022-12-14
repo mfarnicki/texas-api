@@ -10,7 +10,7 @@ namespace Texas.API.Models
         {
             if (managedGames.TryGetValue(gameId, out var game) && game.Player1 != null && game.Player2 != null)
             {
-                game.State = GameState.Active;
+                game.Status = GameStatus.Active;
                 return game;
             }
 
@@ -32,7 +32,7 @@ namespace Texas.API.Models
             PlayerLeave(connectionId);
 
             var newPlayer = new Player { PlayerId = connectionId };
-            game = managedGames.GetOrAdd(gameId, new Game());
+            game = managedGames.GetOrAdd(gameId, new Game { Id = gameId });
             switch (playerNo)
             {
                 case 1:

@@ -7,12 +7,12 @@ public class Game : IGame
     public IPlayer Player1 { get; set; }
     public IPlayer Player2 { get; set; }
 
-    public GameState State { get; set; }
+    public GameStatus Status { get; set; }
 
     public Game()
     {
         this.Id = Guid.NewGuid().ToString();
-        State = GameState.Idle;
+        Status = GameStatus.Idle;
     }
 
     public bool HasPlayer(string playerId, out IPlayer player)

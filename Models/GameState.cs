@@ -1,6 +1,6 @@
 namespace Texas.API.Models
 {
-    public enum GameState
+    public enum GameStatus
     {
         Idle = 0,
         Active = 1,

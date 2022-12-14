@@ -12,8 +12,8 @@ public interface IGame
     [JsonProperty("player2")]
     public IPlayer Player2 { get; set; }
 
-    [JsonProperty("state")]
-    GameState State { get; set; }
+    [JsonProperty("status")]
+    GameStatus Status { get; set; }
 
     bool HasPlayer(string playerId, out IPlayer player);
 }
