@@ -4,16 +4,20 @@ using Texas.API.Models;
 public interface IGame
 {
     [JsonProperty("id")]
-    public string Id { get; set; }
+    string Id { get; set; }
 
-    [JsonProperty("player1")]
-    public IPlayer Player1 { get; set; }
+    [JsonProperty("players")]
+    IPlayer[] Players { get; }
 
-    [JsonProperty("player2")]
-    public IPlayer Player2 { get; set; }
+    [JsonIgnore]
+    ICard[] Deck { get; }
 
     [JsonProperty("status")]
-    GameStatus Status { get; set; }
+    GameStatus Status { get; }
+
+    void Start();
 
     bool HasPlayer(string playerId, out IPlayer player);
+    void RemovePlayer(string playerId);
+    bool AssignPlayer(IPlayer newPlayer, int playerPosition);
 }

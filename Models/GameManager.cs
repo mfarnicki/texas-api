@@ -8,9 +8,9 @@ namespace Texas.API.Models
 
         internal IGame StartGame(string gameId)
         {
-            if (managedGames.TryGetValue(gameId, out var game) && game.Player1 != null && game.Player2 != null)
+            if (managedGames.TryGetValue(gameId, out var game))
             {
-                game.Status = GameStatus.Active;
+                game.Start();
                 return game;
             }
 
@@ -27,21 +27,17 @@ namespace Texas.API.Models
             return null;
         }
 
-        internal bool TryAddPlayer(string gameId, byte playerNo, string connectionId, out IGame game)
+        internal IGame InitGame(string gameId)
+        {
+            return managedGames.GetOrAdd(gameId, new Game { Id = gameId });
+        }
+
+        internal bool TryAddPlayer(string gameId, int playerPosition, string playerName, string connectionId, out IGame game)
         {
             PlayerLeave(connectionId);
 
-            var newPlayer = new Player { PlayerId = connectionId };
-            game = managedGames.GetOrAdd(gameId, new Game { Id = gameId });
-            switch (playerNo)
-            {
-                case 1:
-                    return game.Player1 == null && (game.Player1 = newPlayer) != null;
-                case 2:
-                    return game.Player2 == null && (game.Player2 = newPlayer) != null;
-            }
-
-            return false;
+            var newPlayer = new Player { PlayerId = connectionId, PlayerName = playerName };
+            return managedGames.TryGetValue(gameId, out game) && game.AssignPlayer(newPlayer, playerPosition);
         }
 
         internal IGame PlayerLeave(string playerId)
@@ -49,16 +45,7 @@ namespace Texas.API.Models
             var game = managedGames.Values.SingleOrDefault(game => game.HasPlayer(playerId, out var player));
             if (game != null)
             {
-                if (game.Player1?.PlayerId == playerId)
-                {
-                    game.Player1 = null;
-                }
-
-                if (game.Player2?.PlayerId == playerId)
-                {
-                    game.Player2 = null;
-                }
-
+                game.RemovePlayer(playerId);
                 return game;
             }
 

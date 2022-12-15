@@ -7,11 +7,10 @@ namespace Texas.API.Hubs
     {
         private static readonly GameManager _gameManager = new GameManager();
 
-        public async Task JoinGame(string gameId, byte playerNo)
+        public async Task JoinGame(string gameId, int playerPosition, string playerName)
         {
-            if (_gameManager.TryAddPlayer(gameId, playerNo, this.Context.ConnectionId, out var game))
+            if (_gameManager.TryAddPlayer(gameId, playerPosition, playerName, this.Context.ConnectionId, out var game))
             {
-                await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
                 await this.Clients.Group(gameId).SendAsync("GameState", game);
             }
             else
@@ -26,10 +25,17 @@ namespace Texas.API.Hubs
             var game = _gameManager.PlayerLeave(playerId);
             if (game != null)
             {
-                var gameId = game.Id.ToString();
+                var gameId = game.Id;
                 await this.Groups.RemoveFromGroupAsync(playerId, gameId);
                 await this.Clients.Group(gameId).SendAsync("GameState", game);
             }
+        }
+
+        public async Task InitGame(string gameId)
+        {
+            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
+            var game = _gameManager.InitGame(gameId);
+            await this.Clients.Caller.SendAsync("GameState", game);
         }
 
         public async Task StartGame(string gameId)
