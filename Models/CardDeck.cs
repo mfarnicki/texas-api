@@ -52,7 +52,7 @@ namespace Texas.API.Models
 
         internal ICard[] DealHoles(int playersCount)
         {
-            var result = new ICard[playersCount];
+            var result = new ICard[playersCount * 2];
             for (int i = 0; i < playersCount * 2; i += 2)
             {
                 result[i] = _deck[i];

@@ -9,5 +9,7 @@ namespace Texas.API.Interfaces
         void StartGame();
 
         void ProgressGame();
+
+        string Showdown();
     }
 }

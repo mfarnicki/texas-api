@@ -31,6 +31,11 @@ namespace Texas.API.Hubs
             await this.Clients.Client(playerHoles.PlayerId).SendAsync(PlayerState, playerHoles);
         }
 
+        protected async Task SendPlayerStateToAll(IGame game, IList<IPlayerHole> playerHoles)
+        {
+            await this.Clients.Group(game.Id).SendAsync(PlayerState, playerHoles);
+        }
+
         protected async Task SendError(string errorMessage)
         {
             await this.Clients.Caller.SendAsync(ErrorState, errorMessage);

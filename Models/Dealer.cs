@@ -4,7 +4,7 @@ namespace Texas.API.Models
 {
     public class Dealer : IDealer
     {
-        private readonly CardDeck _cardDeck;
+        private CardDeck _cardDeck;
 
         public IGame Game { get; }
 
@@ -13,11 +13,11 @@ namespace Texas.API.Models
         public Dealer(IGame game)
         {
             this.Game = game;
-            _cardDeck = new CardDeck();
         }
 
         public void StartGame()
         {
+            _cardDeck = new CardDeck();
             _cardDeck.ShuffleDeck();
 
             this.PlayerHoles = new List<IPlayerHole>();
@@ -71,6 +71,16 @@ namespace Texas.API.Models
 
                     break;
             }
+        }
+
+        public string Showdown()
+        {
+            if (this.Game.Status != GameStatus.Final)
+            {
+                return null;
+            }
+
+            return "playerId";
         }
     }
 }

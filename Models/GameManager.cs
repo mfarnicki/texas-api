@@ -23,12 +23,12 @@ namespace Texas.API.Models
             return null;
         }
 
-        public IGame ProgressGame(string gameId)
+        public IDealer ProgressGame(string gameId)
         {
             if (managedGames.TryGetValue(gameId, out var dealer))
             {
                 dealer.ProgressGame();
-                return dealer.Game;
+                return dealer;
             }
 
             return null;

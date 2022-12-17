@@ -12,6 +12,7 @@ public interface IGame
     [JsonProperty("status")]
     GameStatus Status { get; set; }
 
+    [JsonProperty("communityCards")]
     ICard[] CommunityCards { get; }
 
     bool HasPlayer(string playerId, out IPlayer player);

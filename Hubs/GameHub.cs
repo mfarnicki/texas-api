@@ -1,4 +1,5 @@
 using Texas.API.Interfaces;
+using Texas.API.Models;
 
 namespace Texas.API.Hubs
 {
@@ -77,10 +78,14 @@ namespace Texas.API.Hubs
 
         public async Task ProgressGame(string gameId)
         {
-            var game = _gameManager.ProgressGame(gameId);
-            if (game != null)
+            var dealer = _gameManager.ProgressGame(gameId);
+            if (dealer != null)
             {
-                await base.SendGameState(game);
+                await base.SendGameState(dealer.Game);
+                if (dealer.Showdown() != null)
+                {
+                    await base.SendPlayerStateToAll(dealer.Game, dealer.PlayerHoles);
+                }
             }
             else
             {
