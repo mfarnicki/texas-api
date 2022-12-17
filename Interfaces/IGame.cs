@@ -18,4 +18,5 @@ public interface IGame
     bool HasPlayer(string playerId, out IPlayer player);
     bool AddPlayer(IPlayer newPlayer, int position);
     void RemovePlayer(string playerId);
+    void Reset();
 }

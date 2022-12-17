@@ -34,6 +34,17 @@ namespace Texas.API.Models
             return null;
         }
 
+        public IDealer ResetGame(string gameId)
+        {
+            if (managedGames.TryGetValue(gameId, out var dealer))
+            {
+                dealer.ResetGame();
+                return dealer;
+            }
+
+            return null;
+        }
+
         public IGame InitGame(string gameId)
         {
             var dealer = managedGames.GetOrAdd(gameId, id => new Dealer(new Game(id)));

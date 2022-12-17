@@ -8,7 +8,7 @@ public class Game : IGame
 
     public GameStatus Status { get; set; }
 
-    public ICard[] CommunityCards { get; }
+    public ICard[] CommunityCards { get; private set; }
 
     public Game(string gameId)
     {
@@ -43,5 +43,11 @@ public class Game : IGame
                 this.Players[i] = null;
             }
         }
+    }
+
+    public void Reset()
+    {
+        this.Status = GameStatus.Idle;
+        this.CommunityCards = new ICard[5];
     }
 }

@@ -1,5 +1,4 @@
 using Texas.API.Interfaces;
-using Texas.API.Models;
 
 namespace Texas.API.Hubs
 {
@@ -65,9 +64,9 @@ namespace Texas.API.Hubs
             if (dealer != null)
             {
                 await base.SendGameState(dealer.Game);
-                foreach (var holes in dealer.PlayerHoles)
+                foreach (var hole in dealer.PlayerHoles)
                 {
-                    await base.SendPlayerState(holes);
+                    await base.SendPlayerState(hole);
                 }
             }
             else
@@ -84,12 +83,22 @@ namespace Texas.API.Hubs
                 await base.SendGameState(dealer.Game);
                 if (dealer.Showdown() != null)
                 {
-                    await base.SendPlayerStateToAll(dealer.Game, dealer.PlayerHoles);
+                    await base.SendAllPlayersState(dealer.Game, dealer.PlayerHoles);
                 }
             }
             else
             {
                 await base.SendError("Can't progress the game");
+            }
+        }
+
+        public async Task RestartGame(string gameId)
+        {
+            var dealer = _gameManager.ResetGame(gameId);
+            if (dealer != null)
+            {
+                await base.SendGameState(dealer.Game);
+                await base.SendAllPlayersState(dealer.Game, dealer.PlayerHoles);
             }
         }
 

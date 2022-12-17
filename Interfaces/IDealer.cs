@@ -11,5 +11,7 @@ namespace Texas.API.Interfaces
         void ProgressGame();
 
         string Showdown();
+
+        void ResetGame();
     }
 }

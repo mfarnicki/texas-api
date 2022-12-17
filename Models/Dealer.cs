@@ -75,12 +75,21 @@ namespace Texas.API.Models
 
         public string Showdown()
         {
-            if (this.Game.Status != GameStatus.Final)
+            if (this.Game.Status == GameStatus.Final)
             {
-                return null;
+                //todo
+                //calculate winner
+                return "winnerId";
             }
 
-            return "playerId";
+            return null;
+        }
+
+        public void ResetGame()
+        {
+            _cardDeck = null;
+            this.PlayerHoles = null;
+            this.Game.Reset();
         }
     }
 }
