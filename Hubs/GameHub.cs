@@ -1,22 +1,51 @@
-using Microsoft.AspNetCore.SignalR;
-using Texas.API.Models;
+using Texas.API.Interfaces;
 
 namespace Texas.API.Hubs
 {
-    public class GameHub : Hub
+    public class GameHub : BaseGameHub
     {
-        private static readonly GameManager _gameManager = new GameManager();
+        private readonly IGameManager _gameManager;
 
-        public async Task JoinGame(string gameId, int playerPosition, string playerName)
+        public GameHub(IGameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public async Task NewGame()
+        {
+            var game = _gameManager.InitGame(Guid.NewGuid().ToString());
+            await base.ListGamesToAll(_gameManager.GetAllGames());
+        }
+
+        public async Task ListGames()
+        {
+            await base.ListGames(_gameManager.GetAllGames());
+        }
+
+        public async Task DeleteGame(string gameId)
+        {
+            if (_gameManager.DeleteGame(gameId))
+            {
+                await base.ListGamesToAll(_gameManager.GetAllGames());
+            }
+        }
+
+        public async Task AddPlayer(string gameId, int playerPosition, string playerName)
         {
             if (_gameManager.TryAddPlayer(gameId, playerPosition, playerName, this.Context.ConnectionId, out var game))
             {
-                await this.Clients.Group(gameId).SendAsync("GameState", game);
+                await base.SendGameState(game);
             }
             else
             {
-                await this.Clients.Caller.SendAsync("Error", "Can't join this place");
+                await base.SendError("Can't join here");
             }
+        }
+
+        public async Task JoinGame(string gameId)
+        {
+            var game = _gameManager.InitGame(gameId);
+            await base.Join(game);
         }
 
         public async Task LeaveGame()
@@ -25,29 +54,37 @@ namespace Texas.API.Hubs
             var game = _gameManager.PlayerLeave(playerId);
             if (game != null)
             {
-                var gameId = game.Id;
-                await this.Groups.RemoveFromGroupAsync(playerId, gameId);
-                await this.Clients.Group(gameId).SendAsync("GameState", game);
+                await base.Leave(game);
             }
-        }
-
-        public async Task InitGame(string gameId)
-        {
-            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
-            var game = _gameManager.InitGame(gameId);
-            await this.Clients.Caller.SendAsync("GameState", game);
         }
 
         public async Task StartGame(string gameId)
         {
-            var game = _gameManager.StartGame(gameId);
-            if (game != null)
+            var dealer = _gameManager.StartGame(gameId);
+            if (dealer != null)
             {
-                await this.Clients.Group(gameId).SendAsync("GameState", game);
+                await base.SendGameState(dealer.Game);
+                foreach (var holes in dealer.PlayerHoles)
+                {
+                    await base.SendPlayerState(holes);
+                }
             }
             else
             {
-                await this.Clients.Group(gameId).SendAsync("Error", "Can't start the game");
+                await base.SendError("Can't start the game");
+            }
+        }
+
+        public async Task ProgressGame(string gameId)
+        {
+            var game = _gameManager.ProgressGame(gameId);
+            if (game != null)
+            {
+                await base.SendGameState(game);
+            }
+            else
+            {
+                await base.SendError("Can't progress the game");
             }
         }
 

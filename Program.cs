@@ -25,11 +25,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(builder =>
-    builder.WithOrigins(app.Configuration.GetValue<string>("AllowedOrigin")).AllowAnyHeader().AllowAnyMethod()
-);
-
 app.UseAuthorization();
+app.UseCors(builder =>
+    builder.WithOrigins(app.Configuration.GetValue<string>("AllowedOrigin")).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+);
 
 app.MapControllers();
 app.MapHub<GameHub>("/gameHub");

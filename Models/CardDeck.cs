@@ -2,7 +2,7 @@ namespace Texas.API.Models
 {
     public class CardDeck
     {
-        private readonly ICard[] _deck;
+        private ICard[] _deck;
         private readonly Random _random;
 
         public CardDeck()
@@ -17,11 +17,6 @@ namespace Texas.API.Models
                     _deck[suit * 13 + value - 1] = new Card(cardSuit, value);
                 }
             }
-        }
-
-        public ICard[] Deck
-        {
-            get => this._deck;
         }
 
         public void ShuffleDeck()
@@ -53,6 +48,43 @@ namespace Texas.API.Models
                 _deck[normCut] = _deck[i];
                 _deck[i] = card;
             }
+        }
+
+        internal ICard[] DealHoles(int playersCount)
+        {
+            var result = new ICard[playersCount];
+            for (int i = 0; i < playersCount * 2; i += 2)
+            {
+                result[i] = _deck[i];
+                result[i + 1] = _deck[playersCount + i];
+            }
+
+            _deck = _deck.Skip(playersCount * 2).ToArray();
+            return result;
+        }
+
+        internal ICard[] DealFlop()
+        {
+            var result = new ICard[3];
+            result[0] = _deck[1];
+            result[1] = _deck[2];
+            result[2] = _deck[3];
+
+            _deck = _deck.Skip(4).ToArray();
+            return result;
+        }
+
+        internal ICard DealTurn()
+        {
+            var result = _deck[1];
+
+            _deck = _deck.Skip(2).ToArray();
+            return result;
+        }
+
+        internal ICard DealRiver()
+        {
+            return this.DealTurn();
         }
     }
 }

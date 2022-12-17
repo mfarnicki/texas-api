@@ -2,40 +2,36 @@ using Texas.API.Models;
 
 public class Game : IGame
 {
-    private readonly CardDeck _cardDeck;
-    public string Id { get; set; }
+    public string Id { get; }
 
-    public IPlayer[] Players { get; private set; }
+    public IPlayer[] Players { get; }
 
-    public GameStatus Status { get; private set; }
+    public GameStatus Status { get; set; }
 
-    public Game()
+    public ICard[] CommunityCards { get; }
+
+    public Game(string gameId)
     {
-        this.Id = Guid.NewGuid().ToString();
+        this.Id = gameId;
         this.Players = new IPlayer[4];
         this.Status = GameStatus.Idle;
-        _cardDeck = new CardDeck();
-    }
-
-    public void Start()
-    {
-        this.Status = GameStatus.Active;
-        _cardDeck.ShuffleDeck();
+        this.CommunityCards = new ICard[5];
     }
 
     public bool HasPlayer(string playerId, out IPlayer player)
     {
-        foreach (var currentPlayer in this.Players)
+        player = this.Players.SingleOrDefault(p => p?.PlayerId == playerId);
+        return player != null;
+    }
+
+    public bool AddPlayer(IPlayer newPlayer, int position)
+    {
+        if (this.HasPlayer(newPlayer.PlayerId, out _))
         {
-            if (currentPlayer?.PlayerId == playerId)
-            {
-                player = currentPlayer;
-                return true;
-            }
+            this.RemovePlayer(newPlayer.PlayerId);
         }
 
-        player = null;
-        return false;
+        return this.Players[position] == null && (this.Players[position] = newPlayer) != null;
     }
 
     public void RemovePlayer(string playerId)
@@ -47,15 +43,5 @@ public class Game : IGame
                 this.Players[i] = null;
             }
         }
-    }
-
-    public bool AssignPlayer(IPlayer newPlayer, int playerPosition)
-    {
-        return this.Players[playerPosition] == null && (this.Players[playerPosition] = newPlayer) != null;
-    }
-
-    public ICard[] Deck
-    {
-        get => _cardDeck.Deck;
     }
 }

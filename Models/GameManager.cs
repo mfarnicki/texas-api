@@ -1,55 +1,75 @@
 using System.Collections.Concurrent;
+using Texas.API.Interfaces;
 
 namespace Texas.API.Models
 {
-    public class GameManager
+    public class GameManager : IGameManager
     {
-        private ConcurrentDictionary<string, IGame> managedGames = new ConcurrentDictionary<string, IGame>();
+        private ConcurrentDictionary<string, IDealer> managedGames = new ConcurrentDictionary<string, IDealer>();
 
-        internal IGame StartGame(string gameId)
+        public IGame[] GetAllGames()
         {
-            if (managedGames.TryGetValue(gameId, out var game))
+            return this.managedGames.Select(g => g.Value.Game).ToArray();
+        }
+
+        public IDealer StartGame(string gameId)
+        {
+            if (managedGames.TryGetValue(gameId, out var dealer))
             {
-                game.Start();
-                return game;
+                dealer.StartGame();
+                return dealer;
             }
 
             return null;
         }
 
-        internal IGame EndGame(string gameId)
+        public IGame ProgressGame(string gameId)
         {
-            if (managedGames.TryRemove(gameId, out var game))
+            if (managedGames.TryGetValue(gameId, out var dealer))
             {
-                return game;
+                dealer.ProgressGame();
+                return dealer.Game;
             }
 
             return null;
         }
 
-        internal IGame InitGame(string gameId)
+        public IGame InitGame(string gameId)
         {
-            return managedGames.GetOrAdd(gameId, new Game { Id = gameId });
+            var dealer = managedGames.GetOrAdd(gameId, id => new Dealer(new Game(id)));
+            return dealer.Game;
         }
 
-        internal bool TryAddPlayer(string gameId, int playerPosition, string playerName, string connectionId, out IGame game)
+        public bool TryAddPlayer(string gameId, int playerPosition, string playerName, string connectionId, out IGame game)
         {
             PlayerLeave(connectionId);
 
             var newPlayer = new Player { PlayerId = connectionId, PlayerName = playerName };
-            return managedGames.TryGetValue(gameId, out game) && game.AssignPlayer(newPlayer, playerPosition);
+            if (managedGames.TryGetValue(gameId, out var dealer) && dealer.Game.AddPlayer(newPlayer, playerPosition))
+            {
+                game = dealer.Game;
+                return true;
+            }
+
+            game = null;
+            return false;
         }
 
-        internal IGame PlayerLeave(string playerId)
+        public IGame PlayerLeave(string playerId)
         {
-            var game = managedGames.Values.SingleOrDefault(game => game.HasPlayer(playerId, out var player));
-            if (game != null)
+            var dealer = managedGames.Values.SingleOrDefault(dealer => dealer.Game.HasPlayer(playerId, out var player));
+            if (dealer != null)
             {
-                game.RemovePlayer(playerId);
-                return game;
+                dealer.Game.RemovePlayer(playerId);
+                return dealer.Game;
             }
 
             return null;
+        }
+
+        public bool DeleteGame(string gameId)
+        {
+            return managedGames.TryRemove(gameId, out _);
         }
     }
 }

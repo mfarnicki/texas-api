@@ -24,7 +24,7 @@ namespace Texas.API.Models
 
         public async Task<IGame> NewGame()
         {
-            var newGame = new Game();
+            var newGame = new Game(Guid.NewGuid().ToString());
             await this._cosmos.Upsert<Game>(newGame);
 
             return newGame;

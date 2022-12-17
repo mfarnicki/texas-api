@@ -15,6 +15,7 @@ namespace Texas.API
             });
 
             builder.Services.AddScoped<IGamesRepository, GamesRepository>();
+            builder.Services.AddSingleton<IGameManager, GameManager>();
         }
     }
 }
