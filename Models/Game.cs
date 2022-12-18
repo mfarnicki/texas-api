@@ -1,3 +1,4 @@
+using Texas.API.Interfaces;
 using Texas.API.Models;
 
 public class Game : IGame
@@ -8,14 +9,14 @@ public class Game : IGame
 
     public GameStatus Status { get; set; }
 
-    public ICard[] CommunityCards { get; private set; }
+    public IList<ICard> CommunityCards { get; private set; }
 
     public Game(string gameId)
     {
         this.Id = gameId;
         this.Players = new IPlayer[4];
         this.Status = GameStatus.Idle;
-        this.CommunityCards = new ICard[5];
+        this.CommunityCards = new List<ICard>();
     }
 
     public bool HasPlayer(string playerId, out IPlayer player)
@@ -48,6 +49,14 @@ public class Game : IGame
     public void Reset()
     {
         this.Status = GameStatus.Idle;
-        this.CommunityCards = new ICard[5];
+        foreach (var player in this.Players)
+        {
+            if (player != null)
+            {
+                player.PlayerStatus = PlayerStatus.Idle;
+            }
+        }
+
+        this.CommunityCards = new List<ICard>();
     }
 }

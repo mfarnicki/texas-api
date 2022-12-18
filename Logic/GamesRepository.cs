@@ -1,7 +1,7 @@
 using Texas.API.Data;
 using Texas.API.Interfaces;
 
-namespace Texas.API.Models
+namespace Texas.API.Logic
 {
     public class GamesRepository : IGamesRepository
     {

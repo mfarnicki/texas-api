@@ -1,3 +1,5 @@
+using Texas.API.Interfaces;
+
 namespace Texas.API.Models
 {
     public struct Card : ICard
@@ -8,9 +10,9 @@ namespace Texas.API.Models
 
         public Card(Suit suit, byte value)
         {
-            if (value < 1 || value > 13)
+            if (value < 2 || value > 14)
             {
-                throw new ArgumentException("Card value must be in [1,13] range.", nameof(value));
+                throw new ArgumentException("Card value must be in [2,14] range.", nameof(value));
             }
 
             this.Suit = suit;

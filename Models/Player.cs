@@ -5,5 +5,7 @@ namespace Texas.API.Models
         public string PlayerId { get; set; }
 
         public string PlayerName { get; set; }
+
+        public PlayerStatus PlayerStatus { get; set; }
     }
 }

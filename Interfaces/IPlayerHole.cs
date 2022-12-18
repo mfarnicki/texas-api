@@ -11,5 +11,4 @@ namespace Texas.API.Interfaces
         [JsonProperty("holeCard2")]
         ICard HoleCard2 { get; }
     }
-
 }

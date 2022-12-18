@@ -1,9 +1,11 @@
 using Texas.API.Interfaces;
+using Texas.API.Models;
 
-namespace Texas.API.Models
+namespace Texas.API.Logic
 {
     public class Dealer : IDealer
     {
+        private readonly ShowdownEvaluator _evaluator = new ShowdownEvaluator();
         private CardDeck _cardDeck;
 
         public IGame Game { get; }
@@ -31,6 +33,7 @@ namespace Texas.API.Models
                     continue;
                 }
 
+                player.PlayerStatus = PlayerStatus.Waiting;
                 this.PlayerHoles.Add(new PlayerHole(player.PlayerId, holes[i], holes[i + 1]));
                 i += 2;
             }
@@ -44,45 +47,49 @@ namespace Texas.API.Models
             {
                 case GameStatus.Preflop:
                     var flop = _cardDeck.DealFlop();
-                    this.Game.CommunityCards[0] = flop[0];
-                    this.Game.CommunityCards[1] = flop[1];
-                    this.Game.CommunityCards[2] = flop[2];
+                    this.Game.CommunityCards.Add(flop[0]);
+                    this.Game.CommunityCards.Add(flop[1]);
+                    this.Game.CommunityCards.Add(flop[2]);
                     this.Game.Status = GameStatus.Flop;
 
                     break;
 
                 case GameStatus.Flop:
                     var turn = _cardDeck.DealTurn();
-                    this.Game.CommunityCards[3] = turn;
+                    this.Game.CommunityCards.Add(turn);
                     this.Game.Status = GameStatus.Turn;
 
                     break;
 
                 case GameStatus.Turn:
                     var river = _cardDeck.DealRiver();
-                    this.Game.CommunityCards[4] = river;
+                    this.Game.CommunityCards.Add(river);
                     this.Game.Status = GameStatus.River;
 
                     break;
 
                 case GameStatus.River:
-                    // ToDo: winner
                     this.Game.Status = GameStatus.Final;
 
                     break;
             }
         }
 
-        public string Showdown()
+        public bool Showdown()
         {
             if (this.Game.Status == GameStatus.Final)
             {
-                //todo
-                //calculate winner
-                return "winnerId";
+                var winners = _evaluator.EvaluateWinner(this.Game.CommunityCards, this.PlayerHoles);
+                foreach (var winner in winners)
+                {
+                    this.Game.HasPlayer(winner.PlayerId, out var player);
+                    player.PlayerStatus = PlayerStatus.Winner;
+                }
+
+                return true;
             }
 
-            return null;
+            return false;
         }
 
         public void ResetGame()

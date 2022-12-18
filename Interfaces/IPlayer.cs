@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Texas.API.Models;
 
 public interface IPlayer
 {
@@ -7,4 +8,7 @@ public interface IPlayer
 
     [JsonProperty("playerName")]
     string PlayerName { get; }
+
+    [JsonProperty("playerStatus")]
+    PlayerStatus PlayerStatus { get; set; }
 }

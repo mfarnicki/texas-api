@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using Texas.API.Interfaces;
+using Texas.API.Models;
 
-namespace Texas.API.Models
+namespace Texas.API.Logic
 {
     public class GameManager : IGameManager
     {

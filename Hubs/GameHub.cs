@@ -63,11 +63,12 @@ namespace Texas.API.Hubs
             var dealer = _gameManager.StartGame(gameId);
             if (dealer != null)
             {
-                await base.SendGameState(dealer.Game);
                 foreach (var hole in dealer.PlayerHoles)
                 {
                     await base.SendPlayerState(hole);
                 }
+
+                await base.SendGameState(dealer.Game);
             }
             else
             {
@@ -80,11 +81,12 @@ namespace Texas.API.Hubs
             var dealer = _gameManager.ProgressGame(gameId);
             if (dealer != null)
             {
-                await base.SendGameState(dealer.Game);
-                if (dealer.Showdown() != null)
+                if (dealer.Showdown())
                 {
                     await base.SendAllPlayersState(dealer.Game, dealer.PlayerHoles);
                 }
+
+                await base.SendGameState(dealer.Game);
             }
             else
             {

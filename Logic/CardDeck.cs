@@ -1,4 +1,7 @@
-namespace Texas.API.Models
+using Texas.API.Interfaces;
+using Texas.API.Models;
+
+namespace Texas.API.Logic
 {
     public class CardDeck
     {
@@ -12,9 +15,9 @@ namespace Texas.API.Models
             for (byte suit = 0; suit < 4; suit++)
             {
                 var cardSuit = (Suit)suit;
-                for (byte value = 1; value <= 13; value++)
+                for (byte value = 2; value <= 14; value++)
                 {
-                    _deck[suit * 13 + value - 1] = new Card(cardSuit, value);
+                    _deck[suit * 13 + value - 2] = new Card(cardSuit, value);
                 }
             }
         }

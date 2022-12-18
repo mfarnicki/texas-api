@@ -1,11 +1,14 @@
 using Newtonsoft.Json;
 using Texas.API.Models;
 
-public interface ICard
+namespace Texas.API.Interfaces
 {
-    [JsonProperty("suit")]
-    Suit Suit { get; }
+    public interface ICard
+    {
+        [JsonProperty("suit")]
+        Suit Suit { get; }
 
-    [JsonProperty("value")]
-    byte Value { get; }
+        [JsonProperty("value")]
+        byte Value { get; }
+    }
 }
