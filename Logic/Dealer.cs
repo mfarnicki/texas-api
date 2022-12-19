@@ -47,23 +47,23 @@ namespace Texas.API.Logic
             {
                 case GameStatus.Preflop:
                     var flop = _cardDeck.DealFlop();
-                    this.Game.CommunityCards.Add(flop[0]);
-                    this.Game.CommunityCards.Add(flop[1]);
-                    this.Game.CommunityCards.Add(flop[2]);
+                    this.Game.CommunityCards[0] = flop[0];
+                    this.Game.CommunityCards[1] = flop[1];
+                    this.Game.CommunityCards[2] = flop[2];
                     this.Game.Status = GameStatus.Flop;
 
                     break;
 
                 case GameStatus.Flop:
                     var turn = _cardDeck.DealTurn();
-                    this.Game.CommunityCards.Add(turn);
+                    this.Game.CommunityCards[3] = turn;
                     this.Game.Status = GameStatus.Turn;
 
                     break;
 
                 case GameStatus.Turn:
                     var river = _cardDeck.DealRiver();
-                    this.Game.CommunityCards.Add(river);
+                    this.Game.CommunityCards[4] = river;
                     this.Game.Status = GameStatus.River;
 
                     break;

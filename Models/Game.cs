@@ -9,14 +9,14 @@ public class Game : IGame
 
     public GameStatus Status { get; set; }
 
-    public IList<ICard> CommunityCards { get; private set; }
+    public ICard[] CommunityCards { get; private set; }
 
     public Game(string gameId)
     {
         this.Id = gameId;
         this.Players = new IPlayer[4];
         this.Status = GameStatus.Idle;
-        this.CommunityCards = new List<ICard>();
+        this.CommunityCards = new ICard[5];
     }
 
     public bool HasPlayer(string playerId, out IPlayer player)
@@ -57,6 +57,6 @@ public class Game : IGame
             }
         }
 
-        this.CommunityCards = new List<ICard>();
+        this.CommunityCards = new ICard[5];
     }
 }

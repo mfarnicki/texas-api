@@ -14,7 +14,7 @@ public interface IGame
     GameStatus Status { get; set; }
 
     [JsonProperty("communityCards")]
-    IList<ICard> CommunityCards { get; }
+    ICard[] CommunityCards { get; }
 
     bool HasPlayer(string playerId, out IPlayer player);
     bool AddPlayer(IPlayer newPlayer, int position);
