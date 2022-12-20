@@ -5,19 +5,19 @@ namespace Texas.API.Logic
 {
     public class CardDeck
     {
-        private ICard[] _deck;
+        private Stack<ICard> _deck;
         private readonly Random _random;
 
         public CardDeck()
         {
-            _deck = new ICard[52];
+            _deck = new Stack<ICard>(52);
             _random = new Random();
             for (byte suit = 0; suit < 4; suit++)
             {
                 var cardSuit = (Suit)suit;
                 for (byte value = 2; value <= 14; value++)
                 {
-                    _deck[suit * 13 + value - 2] = new Card(cardSuit, value);
+                    _deck.Push(new Card(cardSuit, value));
                 }
             }
         }
@@ -32,62 +32,69 @@ namespace Texas.API.Logic
 
         private void SingleShuffle()
         {
+            var localDeck = _deck.ToArray();
             for (int i = 0; i < 52; i++)
             {
                 var rand = _random.Next(52);
-                var card = _deck[rand];
-                _deck[rand] = _deck[i];
-                _deck[i] = card;
+                var card = localDeck[rand];
+                localDeck[rand] = localDeck[i];
+                localDeck[i] = card;
             }
+
+            _deck = new Stack<ICard>(localDeck);
         }
 
         private void CutDeck()
         {
             var cut = _random.Next(52);
+            var localDeck = _deck.ToArray();
             for (int i = 0; i < 52; i++)
             {
                 var normCut = (i + cut) % 52;
-                var card = _deck[normCut];
-                _deck[normCut] = _deck[i];
-                _deck[i] = card;
+                var card = localDeck[normCut];
+                localDeck[normCut] = localDeck[i];
+                localDeck[i] = card;
             }
+
+            _deck = new Stack<ICard>(localDeck);
         }
 
-        internal ICard[] DealHoles(int playersCount)
+        internal void DealHoles(IPlayer[] players, IPlayerHole[] holes)
         {
-            var result = new ICard[playersCount * 2];
-            for (int i = 0; i < playersCount * 2; i += 2)
+            for (int i = 0; i < 4; i++)
             {
-                result[i] = _deck[i];
-                result[i + 1] = _deck[playersCount + i];
+                if (players[i] == null)
+                {
+                    continue;
+                }
+
+                var holeCard1 = _deck.Pop();
+                var holeCard2 = _deck.Pop();
+
+                holes[i] = new PlayerHole(players[i].PlayerId, holeCard1, holeCard2);
+
+                players[i].PlayerStatus = PlayerStatus.Waiting;
             }
-
-            _deck = _deck.Skip(playersCount * 2).ToArray();
-            return result;
         }
 
-        internal ICard[] DealFlop()
+        internal void DealFlop(ICard[] communityCards)
         {
-            var result = new ICard[3];
-            result[0] = _deck[1];
-            result[1] = _deck[2];
-            result[2] = _deck[3];
-
-            _deck = _deck.Skip(4).ToArray();
-            return result;
+            _deck.Pop();
+            communityCards[0] = _deck.Pop();
+            communityCards[1] = _deck.Pop();
+            communityCards[2] = _deck.Pop();
         }
 
-        internal ICard DealTurn()
+        internal void DealTurn(ICard[] communityCards)
         {
-            var result = _deck[1];
-
-            _deck = _deck.Skip(2).ToArray();
-            return result;
+            _deck.Pop();
+            communityCards[3] = _deck.Pop();
         }
 
-        internal ICard DealRiver()
+        internal void DealRiver(ICard[] communityCards)
         {
-            return this.DealTurn();
+            _deck.Pop();
+            communityCards[4] = _deck.Pop();
         }
     }
 }

@@ -37,6 +37,11 @@ namespace Texas.API.Logic
 
             foreach (var hole in playerHoles)
             {
+                if (hole == null)
+                {
+                    continue;
+                }
+
                 var score = this.EvaluateScore(communityCards, hole.HoleCard1, hole.HoleCard2);
                 scoresMap.Add(new KeyValuePair<int, IPlayerHole>(score, hole));
             }

@@ -17,6 +17,12 @@ namespace Texas.API.Logic
         {
             if (managedGames.TryGetValue(gameId, out var dealer))
             {
+                if (dealer.Game.Players.Count(p => p != null) < 1)
+                {
+                    // don't start a game without players
+                    return null;
+                }
+
                 dealer.StartGame();
                 return dealer;
             }
@@ -35,11 +41,11 @@ namespace Texas.API.Logic
             return null;
         }
 
-        public IDealer ResetGame(string gameId)
+        public IDealer NextRound(string gameId)
         {
             if (managedGames.TryGetValue(gameId, out var dealer))
             {
-                dealer.ResetGame();
+                dealer.NextRound();
                 return dealer;
             }
 

@@ -10,6 +10,12 @@ public interface IGame
     [JsonProperty("players")]
     IPlayer[] Players { get; }
 
+    [JsonProperty("waitingFor")]
+    string WaitingForId { get; set; }
+
+    [JsonProperty("dealerId")]
+    string DealerId { get; set; }
+
     [JsonProperty("status")]
     GameStatus Status { get; set; }
 
@@ -19,5 +25,5 @@ public interface IGame
     bool HasPlayer(string playerId, out IPlayer player);
     bool AddPlayer(IPlayer newPlayer, int position);
     void RemovePlayer(string playerId);
-    void Reset();
+    void NextRound();
 }

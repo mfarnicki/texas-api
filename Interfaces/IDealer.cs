@@ -4,7 +4,7 @@ namespace Texas.API.Interfaces
     {
         IGame Game { get; }
 
-        IList<IPlayerHole> PlayerHoles { get; }
+        IPlayerHole[] PlayerHoles { get; }
 
         void StartGame();
 
@@ -12,6 +12,6 @@ namespace Texas.API.Interfaces
 
         bool Showdown();
 
-        void ResetGame();
+        void NextRound();
     }
 }

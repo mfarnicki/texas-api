@@ -65,7 +65,10 @@ namespace Texas.API.Hubs
             {
                 foreach (var hole in dealer.PlayerHoles)
                 {
-                    await base.SendPlayerState(hole);
+                    if (hole != null)
+                    {
+                        await base.SendPlayerState(hole);
+                    }
                 }
 
                 await base.SendGameState(dealer.Game);
@@ -94,9 +97,9 @@ namespace Texas.API.Hubs
             }
         }
 
-        public async Task RestartGame(string gameId)
+        public async Task NextRound(string gameId)
         {
-            var dealer = _gameManager.ResetGame(gameId);
+            var dealer = _gameManager.NextRound(gameId);
             if (dealer != null)
             {
                 await base.SendGameState(dealer.Game);
