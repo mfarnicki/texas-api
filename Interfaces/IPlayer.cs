@@ -1,14 +1,36 @@
 using Newtonsoft.Json;
-using Texas.API.Models;
 
-public interface IPlayer
+namespace Texas.API.Interfaces
 {
-    [JsonProperty("playerId")]
-    string PlayerId { get; }
+    public interface IPlayer
+    {
+        [JsonProperty("id")]
+        string Id { get; }
 
-    [JsonProperty("playerName")]
-    string PlayerName { get; }
+        [JsonProperty("name")]
+        string Name { get; }
 
-    [JsonProperty("playerStatus")]
-    PlayerStatus PlayerStatus { get; set; }
+        [JsonProperty("status")]
+        PlayerStatus Status { get; set; }
+
+        [JsonProperty("chips")]
+        int Chips { get; }
+
+        [JsonProperty("currentBet")]
+        int CurrentBet { get; }
+
+        void ClearBet();
+        int PlaceBet(int amount);
+        void Payout(int amount);
+    }
+
+    public enum PlayerStatus
+    {
+        Idle = 0,
+        Waiting = 1,
+        AllIn = 2,
+        Fold = 3,
+        Won = 4,
+        Lost = 5
+    }
 }

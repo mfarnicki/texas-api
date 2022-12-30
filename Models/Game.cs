@@ -1,127 +1,147 @@
 using Texas.API.Interfaces;
-using Texas.API.Models;
 
-public class Game : IGame
+namespace Texas.API.Models
 {
-    public string Id { get; }
-
-    public IPlayer[] Players { get; }
-
-    public string WaitingForId { get; set; }
-
-    public string DealerId { get; set; }
-
-    public GameStatus Status { get; set; }
-
-    public ICard[] CommunityCards { get; private set; }
-
-    public Game(string gameId)
+    public class Game : IGame
     {
-        this.Id = gameId;
-        this.Players = new IPlayer[4];
-        this.Status = GameStatus.Idle;
-        this.CommunityCards = new ICard[5];
-    }
+        public string Id { get; }
 
-    public bool HasPlayer(string playerId, out IPlayer player)
-    {
-        player = this.Players.SingleOrDefault(p => p?.PlayerId == playerId);
-        return player != null;
-    }
+        public IPlayer[] Players { get; }
 
-    public bool AddPlayer(IPlayer newPlayer, int position)
-    {
-        if (this.HasPlayer(newPlayer.PlayerId, out _))
+        public string WaitingForId { get; set; }
+
+        public string DealerId { get; set; }
+
+        public GameStatus Status { get; set; }
+
+        public ICard[] CommunityCards { get; private set; }
+
+        public int CurrentPot { get; set; }
+
+        public int HighestBet { get; set; }
+
+        public Game(string gameId)
         {
-            this.RemovePlayer(newPlayer.PlayerId);
+            this.Id = gameId;
+            this.Players = new IPlayer[4];
+            this.Status = GameStatus.Idle;
+            this.CommunityCards = new ICard[5];
+
+#if DEBUG
+            this.Players[1] = new Player("computer1", 1000) { Name = "Computer1" };
+            this.Players[2] = new Player("computer2", 1000) { Name = "Computer2" };
+            this.Players[3] = new Player("computer3", 1000) { Name = "Computer3" };
+            this.DealerId = this.Players[1].Id;
+#endif
         }
 
-        if (this.Players.All(p => p == null))
+        public bool HasPlayer(string playerId, out IPlayer player)
         {
-            DealerId = newPlayer.PlayerId;
+            player = this.Players.SingleOrDefault(p => p?.Id == playerId);
+            return player != null;
         }
 
-        return this.Players[position] == null && (this.Players[position] = newPlayer) != null;
-    }
-
-    public void RemovePlayer(string playerId)
-    {
-        for (int i = 0; i < 4; i++)
+        public bool AddPlayer(IPlayer newPlayer, int position)
         {
-            if (this.Players[i]?.PlayerId == playerId)
+            if (this.HasPlayer(newPlayer.Id, out _))
             {
-                var nextPlayer = this.NextPlayer(playerId);
-                if (nextPlayer != null)
-                {
-                    if (playerId == WaitingForId)
-                    {
-                        this.WaitingForId = nextPlayer.PlayerId;
-                    }
-
-                    if (playerId == DealerId)
-                    {
-                        this.DealerId = nextPlayer.PlayerId;
-                    }
-                }
-
-                this.Players[i] = null;
+                this.RemovePlayer(newPlayer.Id);
             }
-        }
-    }
 
-    public void NextRound()
-    {
-        this.Status = GameStatus.Idle;
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (this.Players[i] != null)
+            if (this.Players.All(p => p == null))
             {
-                this.Players[i].PlayerStatus = PlayerStatus.Idle;
+                DealerId = newPlayer.Id;
             }
+
+            return this.Players[position] == null && (this.Players[position] = newPlayer) != null;
         }
 
-        var prevPlayer = this.PrevPlayer(this.DealerId);
-        DealerId = prevPlayer.PlayerId;
-
-        this.CommunityCards = new ICard[5];
-    }
-
-    private IPlayer NextPlayer(string playerId)
-    {
-        for (int i = 0; i < 4; i++)
+        public void RemovePlayer(string playerId)
         {
-            if (this.Players[i]?.PlayerId == playerId)
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = i + 1; j < i + 5; j++)
+                if (this.Players[i]?.Id == playerId)
                 {
-                    if (this.Players[j % 4] != null)
+                    var nextPlayer = this.NextPlayer(playerId);
+                    if (nextPlayer != null)
                     {
-                        return this.Players[j % 4];
+                        if (playerId == WaitingForId)
+                        {
+                            this.WaitingForId = nextPlayer.Id;
+                        }
+
+                        if (playerId == DealerId)
+                        {
+                            this.DealerId = nextPlayer.Id;
+                        }
                     }
+
+                    this.Players[i] = null;
                 }
             }
         }
 
-        return null;
-    }
-
-    private IPlayer PrevPlayer(string playerId)
-    {
-        for (int i = 0; i < 4; i++)
+        public bool NextStage()
         {
-            if (this.Players[i]?.PlayerId == playerId)
+            return this.Players.Aggregate(true, (next, player) => next && (player == null || player.Status == PlayerStatus.Fold || player.CurrentBet == this.HighestBet));
+        }
+
+        public void NextRound()
+        {
+            this.Status = GameStatus.Idle;
+
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = i - 1; j > i - 5; j--)
+                if (this.Players[i] != null)
                 {
-                    if (this.Players[(j + 4) % 4] != null)
+                    this.Players[i].Status = PlayerStatus.Idle;
+                    this.Players[i].ClearBet();
+
+                }
+            }
+
+            var prevPlayer = this.PrevPlayer(this.DealerId);
+            DealerId = prevPlayer?.Id;
+
+            this.CommunityCards = new ICard[5];
+        }
+
+        public IPlayer NextPlayer(string playerId)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (this.Players[i]?.Id == playerId)
+                {
+                    for (int j = i + 1; j < i + 5; j++)
                     {
-                        return this.Players[(j + 4) % 4];
+                        if (this.Players[j % 4] != null)
+                        {
+                            return this.Players[j % 4];
+                        }
                     }
                 }
             }
+
+            return null;
         }
 
-        return null;
+        public IPlayer PrevPlayer(string playerId)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (this.Players[i]?.Id == playerId)
+                {
+                    for (int j = i - 1; j > i - 5; j--)
+                    {
+                        if (this.Players[(j + 4) % 4] != null)
+                        {
+                            return this.Players[(j + 4) % 4];
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

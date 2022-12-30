@@ -1,11 +1,12 @@
 using Texas.API.Interfaces;
-using Texas.API.Models;
 
 namespace Texas.API.Logic
 {
     public class Dealer : IDealer
     {
         private readonly ShowdownEvaluator _evaluator = new ShowdownEvaluator();
+
+        private PotManager _potManager;
 
         private CardDeck _cardDeck;
 
@@ -25,6 +26,9 @@ namespace Texas.API.Logic
 
             this.PlayerHoles = new IPlayerHole[4];
             _cardDeck.DealHoles(this.Game.Players, this.PlayerHoles);
+
+            _potManager = new PotManager(this.Game);
+            _potManager.Blinds();
 
             this.Game.Status = GameStatus.Preflop;
         }
@@ -58,15 +62,59 @@ namespace Texas.API.Logic
             }
         }
 
+        public void PlayerMove(IPlayerMove playerMove)
+        {
+            if (this.Game.HasPlayer(playerMove.PlayerId, out var player))
+            {
+                switch (playerMove.Move)
+                {
+                    case MoveType.Bet:
+                        _potManager.Bet(player, playerMove.Amount);
+                        break;
+
+                    case MoveType.Call:
+                        _potManager.Call(player);
+                        break;
+
+                    case MoveType.Fold:
+                        _potManager.Fold(player);
+                        break;
+                }
+            }
+
+            if (this.Game.NextStage())
+            {
+                foreach (var p in this.Game.Players)
+                {
+                    if (p != null)
+                    {
+                        p.ClearBet();
+                    }
+                }
+
+                this.ProgressGame();
+            }
+        }
+
         public bool Showdown()
         {
+            if (this.Game.Players.Count(p => p?.Status == PlayerStatus.Fold) == (this.Game.Players.Count(p => p != null) - 1))
+            {
+                var winner = this.Game.Players.Single(p => p != null && p.Status != PlayerStatus.Fold);
+                winner.Status = PlayerStatus.Won;
+                _potManager.Payout(winner, 1);
+
+                return true;
+            }
+
             if (this.Game.Status == GameStatus.Final)
             {
                 var winners = _evaluator.EvaluateWinner(this.Game.CommunityCards, this.PlayerHoles);
                 foreach (var winner in winners)
                 {
                     this.Game.HasPlayer(winner.PlayerId, out var player);
-                    player.PlayerStatus = PlayerStatus.Winner;
+                    player.Status = PlayerStatus.Won;
+                    _potManager.Payout(player, winners.Count);
                 }
 
                 return true;

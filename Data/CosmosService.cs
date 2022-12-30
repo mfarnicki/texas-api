@@ -1,5 +1,6 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
+using Texas.API.Interfaces;
 
 namespace Texas.API.Data
 {

@@ -10,6 +10,8 @@ namespace Texas.API.Interfaces
 
         void ProgressGame();
 
+        void PlayerMove(IPlayerMove playerMove);
+
         bool Showdown();
 
         void NextRound();

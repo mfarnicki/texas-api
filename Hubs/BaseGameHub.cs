@@ -41,10 +41,14 @@ namespace Texas.API.Hubs
             await this.Clients.Caller.SendAsync(ErrorState, errorMessage);
         }
 
-        protected async Task Join(IGame game)
+        protected async Task Join(IDealer dealer)
         {
-            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, game.Id);
-            await this.Clients.Caller.SendAsync(GameState, game);
+            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, dealer.Game.Id);
+            await this.Clients.Caller.SendAsync(GameState, dealer.Game);
+            if (dealer.Game.Status == GameStatus.Final)
+            {
+                await this.Clients.Caller.SendAsync(PlayerState, dealer.PlayerHoles);
+            }
         }
 
         protected async Task Leave(IGame game)

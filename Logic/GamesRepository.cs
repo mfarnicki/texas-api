@@ -1,5 +1,6 @@
 using Texas.API.Data;
 using Texas.API.Interfaces;
+using Texas.API.Models;
 
 namespace Texas.API.Logic
 {

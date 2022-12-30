@@ -41,6 +41,22 @@ namespace Texas.API.Logic
             return null;
         }
 
+        public IDealer PlayerMove(string gameId, IPlayerMove move)
+        {
+            if (managedGames.TryGetValue(gameId, out var dealer))
+            {
+                if (dealer.Game.WaitingForId != move.PlayerId)
+                {
+                    return null;
+                }
+
+                dealer.PlayerMove(move);
+                return dealer;
+            }
+
+            return null;
+        }
+
         public IDealer NextRound(string gameId)
         {
             if (managedGames.TryGetValue(gameId, out var dealer))
@@ -52,18 +68,17 @@ namespace Texas.API.Logic
             return null;
         }
 
-        public IGame InitGame(string gameId)
+        public IDealer InitGame(string gameId)
         {
             var dealer = managedGames.GetOrAdd(gameId, id => new Dealer(new Game(id)));
-            return dealer.Game;
+            return dealer;
         }
 
-        public bool TryAddPlayer(string gameId, int playerPosition, string playerName, string connectionId, out IGame game)
+        public bool TryAddPlayer(string gameId, int playerPosition, IPlayer player, out IGame game)
         {
-            PlayerLeave(connectionId);
+            PlayerLeave(player.Id);
 
-            var newPlayer = new Player { PlayerId = connectionId, PlayerName = playerName };
-            if (managedGames.TryGetValue(gameId, out var dealer) && dealer.Game.AddPlayer(newPlayer, playerPosition))
+            if (managedGames.TryGetValue(gameId, out var dealer) && dealer.Game.AddPlayer(player, playerPosition))
             {
                 game = dealer.Game;
                 return true;

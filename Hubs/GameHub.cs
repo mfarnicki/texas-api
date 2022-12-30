@@ -1,4 +1,5 @@
 using Texas.API.Interfaces;
+using Texas.API.Models;
 
 namespace Texas.API.Hubs
 {
@@ -13,7 +14,7 @@ namespace Texas.API.Hubs
 
         public async Task NewGame()
         {
-            var game = _gameManager.InitGame(Guid.NewGuid().ToString());
+            _gameManager.InitGame(Guid.NewGuid().ToString());
             await base.ListGamesToAll(_gameManager.GetAllGames());
         }
 
@@ -30,22 +31,26 @@ namespace Texas.API.Hubs
             }
         }
 
-        public async Task AddPlayer(string gameId, int playerPosition, string playerName)
+        public async Task<string> AddPlayer(string gameId, int playerPosition, Player player)
         {
-            if (_gameManager.TryAddPlayer(gameId, playerPosition, playerName, this.Context.ConnectionId, out var game))
+            player.Id = this.Context.ConnectionId;
+            if (_gameManager.TryAddPlayer(gameId, playerPosition, player, out var game))
             {
                 await base.SendGameState(game);
+                return await Task.FromResult(player.Id);
             }
             else
             {
                 await base.SendError("Can't join here");
             }
+
+            return await Task.FromResult<string>(null);
         }
 
         public async Task JoinGame(string gameId)
         {
-            var game = _gameManager.InitGame(gameId);
-            await base.Join(game);
+            var dealer = _gameManager.InitGame(gameId);
+            await base.Join(dealer);
         }
 
         public async Task LeaveGame()
@@ -94,6 +99,24 @@ namespace Texas.API.Hubs
             else
             {
                 await base.SendError("Can't progress the game");
+            }
+        }
+
+        public async Task PlayerMove(string gameId, PlayerMove move)
+        {
+            var dealer = _gameManager.PlayerMove(gameId, move);
+            if (dealer != null)
+            {
+                if (dealer.Showdown())
+                {
+                    await base.SendAllPlayersState(dealer.Game, dealer.PlayerHoles);
+                }
+
+                await base.SendGameState(dealer.Game);
+            }
+            else
+            {
+                await base.SendError("It's not your turn");
             }
         }
 

@@ -5,9 +5,10 @@ namespace Texas.API.Interfaces
         IGame[] GetAllGames();
         IDealer StartGame(string gameId);
         IDealer ProgressGame(string gameId);
+        IDealer PlayerMove(string gameId, IPlayerMove move);
         IDealer NextRound(string gameId);
-        IGame InitGame(string gameId);
-        bool TryAddPlayer(string gameId, int playerPosition, string playerName, string connectionId, out IGame game);
+        IDealer InitGame(string gameId);
+        bool TryAddPlayer(string gameId, int playerPosition, IPlayer player, out IGame game);
         IGame PlayerLeave(string playerId);
         bool DeleteGame(string gameId);
     }

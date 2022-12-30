@@ -71,9 +71,9 @@ namespace Texas.API.Logic
                 var holeCard1 = _deck.Pop();
                 var holeCard2 = _deck.Pop();
 
-                holes[i] = new PlayerHole(players[i].PlayerId, holeCard1, holeCard2);
+                holes[i] = new PlayerHole(players[i].Id, holeCard1, holeCard2);
 
-                players[i].PlayerStatus = PlayerStatus.Waiting;
+                players[i].Status = PlayerStatus.Waiting;
             }
         }
 

@@ -1,3 +1,5 @@
+using Texas.API.Interfaces;
+
 namespace Texas.API.Data
 {
     public interface ICosmosService
