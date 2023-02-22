@@ -1,6 +1,7 @@
 using Texas.API.Interfaces;
 using Texas.API.Logic;
 using Texas.API.Tests.Helper;
+using Xunit;
 
 namespace Texas.API.Tests;
 

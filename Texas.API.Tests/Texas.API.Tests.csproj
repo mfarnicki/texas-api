@@ -17,6 +17,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Texas.API\Texas.API.csproj" />
+    <ProjectReference Include="..\Texas.API.csproj" />
   </ItemGroup>
 </Project>
